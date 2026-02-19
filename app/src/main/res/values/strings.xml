@@ -4,4 +4,8 @@
     <string name="preparation_title">Préparation</string>
     <string name="favorite_added">Ajouté aux favoris !</string>
     <string name="detail_title">Détail Cocktail</string>
+    <string name="tab_random">A la une</string>
+    <string name="tab_categories">Catégories</string>
+    <string name="tab_favorites">Favoris</string>
+    <string name="drinks_title">Boissons</string>
 </resources>
