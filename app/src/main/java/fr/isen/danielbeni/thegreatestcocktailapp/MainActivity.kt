@@ -2,7 +2,6 @@ package fr.isen.danielbeni.thegreatestcocktailapp
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -33,6 +32,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import fr.isen.danielbeni.thegreatestcocktailapp.dataClasses.CocktailResponse
 import fr.isen.danielbeni.thegreatestcocktailapp.dataClasses.Drink
+import fr.isen.danielbeni.thegreatestcocktailapp.managers.FavoritesManager
 import fr.isen.danielbeni.thegreatestcocktailapp.network.NetworkManager
 import fr.isen.danielbeni.thegreatestcocktailapp.ui.theme.TheGreatestCocktailAppTheme
 import retrofit2.Call
@@ -47,6 +47,12 @@ class MainActivity : ComponentActivity() {
 
     // état observable pour le cocktail aléatoire
     private val randomCocktail = mutableStateOf<Drink?>(null)
+
+    // NOUVEAU : état pour l'icône favori (cœur plein ou vide)
+    private val isFavorite = mutableStateOf(false)
+
+    // NOUVEAU : instance du manager des favoris
+    private val favoritesManager = FavoritesManager()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,17 +95,23 @@ class MainActivity : ComponentActivity() {
                                 actionIconContentColor = colorResource(R.color.white)
                             ),
                             actions = {
-                                IconButton(onClick = {
-                                    Toast.makeText(
-                                        context,
-                                        context.getString(R.string.favorite_added),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.FavoriteBorder,
-                                        contentDescription = "Add to favorites"
-                                    )
+                                // MODIFIÉ : le bouton favori toggle au lieu d'afficher un Toast
+                                randomCocktail.value?.let { drink ->
+                                    IconButton(onClick = {
+                                        // Toggle le favori dans SharedPreferences
+                                        favoritesManager.toggleFavorite(drink, context)
+                                        // Met à jour l'icône immédiatement
+                                        isFavorite.value = favoritesManager.isFavorite(drink, context)
+                                    }) {
+                                        Icon(
+                                            // Cœur plein si favori, vide sinon
+                                            imageVector = if (isFavorite.value)
+                                                Icons.Filled.Favorite
+                                            else
+                                                Icons.Filled.FavoriteBorder,
+                                            contentDescription = "Toggle favori"
+                                        )
+                                    }
                                 }
                             }
                         )
@@ -124,6 +136,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(favoritesTab.title) {
+                            // MODIFIÉ : passe le FavoritesManager au FavoritesScreen
                             FavoritesScreen(
                                 modifier = Modifier.padding(innerPadding)
                             )
@@ -148,8 +161,14 @@ class MainActivity : ComponentActivity() {
                     call: Call<CocktailResponse>,
                     response: Response<CocktailResponse>
                 ) {
-                    randomCocktail.value = response.body()?.drinks?.firstOrNull()
-                    Log.d(TAG, "Cocktail chargé: ${randomCocktail.value?.strDrink}")
+                    val drink = response.body()?.drinks?.firstOrNull()
+                    randomCocktail.value = drink
+                    Log.d(TAG, "Cocktail chargé: ${drink?.strDrink}")
+
+                    // NOUVEAU : met à jour l'état favori pour le nouveau cocktail
+                    drink?.let {
+                        isFavorite.value = favoritesManager.isFavorite(it, this@MainActivity)
+                    }
                 }
 
                 override fun onFailure(call: Call<CocktailResponse>, t: Throwable) {
@@ -162,6 +181,10 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         Log.d(TAG, "onResume")
+        // NOUVEAU : re-vérifie le statut favori au retour (l'utilisateur a pu le modifier ailleurs)
+        randomCocktail.value?.let {
+            isFavorite.value = favoritesManager.isFavorite(it, this)
+        }
     }
 
     override fun onPause() {
