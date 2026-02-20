@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -30,13 +31,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import fr.isen.danielbeni.thegreatestcocktailapp.dataClasses.CocktailResponse
+import fr.isen.danielbeni.thegreatestcocktailapp.dataClasses.Drink
+import fr.isen.danielbeni.thegreatestcocktailapp.network.NetworkManager
 import fr.isen.danielbeni.thegreatestcocktailapp.ui.theme.TheGreatestCocktailAppTheme
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : ComponentActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
     }
+
+    // état observable pour le cocktail aléatoire
+    private val randomCocktail = mutableStateOf<Drink?>(null)
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +57,6 @@ class MainActivity : ComponentActivity() {
             val context = LocalContext.current
             val navController = rememberNavController()
 
-            // Définition des 3 onglets
             val randomTab = TabBarItem(
                 title = stringResource(R.string.tab_random),
                 selectedIcon = Icons.Filled.Home,
@@ -71,7 +80,8 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         TopAppBar(
                             title = {
-                                Text(stringResource(R.string.app_name))
+                                Text(randomCocktail.value?.strDrink
+                                    ?: stringResource(R.string.app_name))
                             },
                             colors = TopAppBarDefaults.topAppBarColors(
                                 containerColor = colorResource(R.color.purple_700),
@@ -98,14 +108,14 @@ class MainActivity : ComponentActivity() {
                         BottomNavigationBar(tabItems, navController)
                     }
                 ) { innerPadding ->
-                    // NavHost = le conteneur qui affiche l'écran correspondant à l'onglet
                     NavHost(
                         navController = navController,
                         startDestination = randomTab.title
                     ) {
                         composable(randomTab.title) {
                             DetailCocktailScreen(
-                                modifier = Modifier.padding(innerPadding)
+                                modifier = Modifier.padding(innerPadding),
+                                drink = randomCocktail.value
                             )
                         }
                         composable(categoriesTab.title) {
@@ -124,33 +134,53 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // appelé chaque fois que l'Activity devient visible → charge un cocktail random
     override fun onStart() {
         super.onStart()
-        Log.d(TAG, "onStart - activity est visible")
+        Log.d(TAG, "onStart - chargement du cocktail aléatoire")
+        fetchRandomCocktail()
+    }
+
+    private fun fetchRandomCocktail() {
+        NetworkManager.api.getRandomCocktail().enqueue(
+            object : Callback<CocktailResponse> {
+                override fun onResponse(
+                    call: Call<CocktailResponse>,
+                    response: Response<CocktailResponse>
+                ) {
+                    randomCocktail.value = response.body()?.drinks?.firstOrNull()
+                    Log.d(TAG, "Cocktail chargé: ${randomCocktail.value?.strDrink}")
+                }
+
+                override fun onFailure(call: Call<CocktailResponse>, t: Throwable) {
+                    Log.e(TAG, "Erreur réseau: ${t.message}")
+                }
+            }
+        )
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d(TAG, "onResume - activity est en premier plan")
+        Log.d(TAG, "onResume")
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d(TAG, "onPause - activity est en pause")
+        Log.d(TAG, "onPause")
     }
 
     override fun onStop() {
         super.onStop()
-        Log.d(TAG, "onStop - activity est en arrière plan")
+        Log.d(TAG, "onStop")
     }
 
     override fun onRestart() {
         super.onRestart()
-        Log.d(TAG, "onRestart - activity redevient visible")
+        Log.d(TAG, "onRestart")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "onDestroy - activity est détruite")
+        Log.d(TAG, "onDestroy")
     }
 }

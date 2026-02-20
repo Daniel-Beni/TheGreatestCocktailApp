@@ -19,7 +19,6 @@ class DrinksActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Récupère la catégorie passée par l'Intent
         val categoryName = intent.getStringExtra("CATEGORY_NAME") ?: "Boissons"
 
         enableEdgeToEdge()

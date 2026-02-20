@@ -1,46 +1,47 @@
-
 package fr.isen.danielbeni.thegreatestcocktailapp
+
 import androidx.compose.foundation.background
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.res.colorResource
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.Alignment
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.foundation.layout.size
-import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.border
-import androidx.compose.material3.Text
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import fr.isen.danielbeni.thegreatestcocktailapp.models.Category
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.material3.Card
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.foundation.layout.height
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import fr.isen.danielbeni.thegreatestcocktailapp.dataClasses.Drink
+import fr.isen.danielbeni.thegreatestcocktailapp.models.Category
 
 @Composable
-fun DetailCocktailScreen(modifier: Modifier = Modifier){
+fun DetailCocktailScreen(modifier: Modifier = Modifier, drink: Drink? = null) {
     Box(
         Modifier
             .background(
@@ -48,128 +49,141 @@ fun DetailCocktailScreen(modifier: Modifier = Modifier){
                     listOf(
                         colorResource(R.color.purple_500),
                         colorResource(R.color.purple_700)
-                  )
+                    )
                 )
             )
             .fillMaxSize()
     ) {
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // image Circulaire du cocktail
-            Image(
-                painter = painterResource(R.drawable.yoghurt_cooler),
-                contentDescription = "Yoghurt Cooler",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape)
-                    .border(2.dp, colorResource(R.color.white), CircleShape)
-            )
-
-            // Titre du cocktail
-            Text(
-                text = "Yoghurt Cooler",
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorResource(R.color.white)
-            )
-            // Badges de catégories
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth()
+        if (drink == null) {
+            // Affiche un loader pendant le chargement
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                CategoryBadge(Category.OTHER)
-                CategoryBadge(Category.NON_ALCOHOLIC)
+                CircularProgressIndicator(color = colorResource(R.color.white))
             }
-            // Type de verre
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
-
+        } else {
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Info,
-                    contentDescription = "Glass type",
-                    tint = colorResource(R.color.grey),
-                    modifier = Modifier.size(20.dp)
-
+                // Image circulaire du cocktail (depuis le web avec Coil)
+                AsyncImage(
+                    model = drink.strDrinkThumb,
+                    contentDescription = drink.strDrink,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, colorResource(R.color.white), CircleShape)
                 )
-                Spacer(modifier = Modifier.width(6.dp))
+
+                // Titre du cocktail
                 Text(
-                    text = "Highball Glass",
-                    color = colorResource(R.color.grey),
-                    fontStyle = FontStyle.Italic,
-                    fontSize = 16.sp
-
+                    text = drink.strDrink ?: "Cocktail inconnu",
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(R.color.white)
                 )
 
-            }
-            // Card Ingrédients
-            Card(
-                shape = RoundedCornerShape(12.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-
+                // Badges de catégories
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = stringResource(R.string.ingredients_title),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("• 1 tasse de yaourt")
-                    Text("• 1 tasse d'eau")
-                    Text("• 2 c. à soupe de sucre")
-                    Text("• 1/4 c. à café de cumin en poudre")
-                    Text("• Une pincée de sel")
-                    Text("• Feuilles de menthe fraîche")
-                    Text("• Glaçons")
+                    drink.strCategory?.let { categoryName ->
+                        CategoryBadge(Category.fromApiName(categoryName))
+                    }
+                    drink.strAlcoholic?.let { alcoholicType ->
+                        if (alcoholicType == "Alcoholic") {
+                            CategoryBadge(Category.ALCOHOLIC)
+                        } else {
+                            CategoryBadge(Category.NON_ALCOHOLIC)
+                        }
+                    }
+                }
+
+                // Type de verre
+                drink.strGlass?.let { glass ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = "Glass type",
+                            tint = colorResource(R.color.grey),
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = glass,
+                            color = colorResource(R.color.grey),
+                            fontStyle = FontStyle.Italic,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+
+                // Card Ingrédients
+                val ingredients = drink.ingredientList()
+                if (ingredients.isNotEmpty()) {
+                    Card(
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                text = stringResource(R.string.ingredients_title),
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            ingredients.forEach { (ingredient, measure) ->
+                                Text("• $measure $ingredient".trim())
+                            }
+                        }
+                    }
+                }
+
+                // Card Préparation
+                drink.strInstructions?.let { instructions ->
+                    Card(
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                text = stringResource(R.string.preparation_title),
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            // Préfère les instructions en français si disponibles
+                            Text(drink.strInstructionsFR ?: instructions)
+                        }
+                    }
                 }
             }
-
-
-            // Card Préparation
-            Card(
-                shape = RoundedCornerShape(12.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        text = stringResource(R.string.preparation_title),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        "Mélangez le yaourt avec l'eau froide et le sucre jusqu'à l'obtention d'un mélange homogène. " +
-                                "Ajoutez une pincée de sel et de cumin en poudre, puis mélangez bien. " +
-                                "Versez dans un grand verre (type highball) rempli de glaçons. " +
-                                "Décorez avec des feuilles de menthe fraîche et saupoudrez légèrement de cumin sur le dessus. " +
-                                "Servez immédiatement."
-                    )
-                }
-            }
-
         }
     }
 }
+
 @Composable
 fun CategoryBadge(category: Category) {
     Box(
