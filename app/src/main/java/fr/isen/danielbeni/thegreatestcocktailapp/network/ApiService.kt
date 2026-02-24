@@ -28,4 +28,20 @@ interface ApiService {
     fun getDrinkDetail(
         @Query("i") drinkId: String
     ): Call<CocktailResponse>
+
+    // ── Section 6 — Recherche ────────────────────
+
+    // GET https://www.thecocktaildb.com/api/json/v1/1/search.php?s=margarita
+    // Recherche par nom → retourne des Drink COMPLETS
+    @GET("search.php")
+    fun searchByName(
+        @Query("s") name: String
+    ): Call<CocktailResponse>
+
+    // GET https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=Vodka
+    // Recherche par ingrédient → retourne des DrinkPreview (id, nom, thumb seulement)
+    @GET("filter.php")
+    fun searchByIngredient(
+        @Query("i") ingredient: String
+    ): Call<DrinkFilterResponse>
 }

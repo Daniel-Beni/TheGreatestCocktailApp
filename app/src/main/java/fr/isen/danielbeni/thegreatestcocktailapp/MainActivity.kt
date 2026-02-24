@@ -38,6 +38,8 @@ import fr.isen.danielbeni.thegreatestcocktailapp.ui.theme.TheGreatestCocktailApp
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Search
 
 class MainActivity : ComponentActivity() {
 
@@ -78,7 +80,12 @@ class MainActivity : ComponentActivity() {
                 selectedIcon = Icons.Filled.Favorite,
                 unselectedIcon = Icons.Outlined.Favorite
             )
-            val tabItems = listOf(randomTab, categoriesTab, favoritesTab)
+            val searchTab = TabBarItem(
+                title = stringResource(R.string.tab_search),
+                selectedIcon = Icons.Filled.Search,
+                unselectedIcon = Icons.Outlined.Search
+            )
+            val tabItems = listOf(randomTab, categoriesTab, favoritesTab, searchTab)
 
             TheGreatestCocktailAppTheme {
                 Scaffold(
@@ -138,6 +145,12 @@ class MainActivity : ComponentActivity() {
                         composable(favoritesTab.title) {
                             // MODIFIÉ : passe le FavoritesManager au FavoritesScreen
                             FavoritesScreen(
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
+                        //route vers l'ecran de recherche
+                        composable(searchTab.title) {
+                            SearchScreen(
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }
