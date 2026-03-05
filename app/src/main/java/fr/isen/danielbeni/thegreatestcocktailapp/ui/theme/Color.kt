@@ -2,10 +2,11 @@ package fr.isen.danielbeni.thegreatestcocktailapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Palette sombre et élégante
+val WineLight = Color(0xFFC9A0B8)      // Rose muted
+val WineGrey = Color(0xFF8A8380)        // Warm grey
+val WineRose = Color(0xFFD4B8C7)        // Soft rose
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val WineDark = Color(0xFF1A1625)        // Near-black purple
+val WinePlum = Color(0xFF6B3557)        // Deep plum
+val GoldAccent = Color(0xFFC4955A)      // Warm gold

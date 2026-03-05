@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <!--  Palette minimalist wine/gold -->
+    <color name="purple_200">#FFC9A0B8</color>
+    <color name="purple_500">#FF6B3557</color>
+    <color name="purple_700">#FF1A1625</color>
+    <color name="teal_200">#FF8DBFA8</color>
+    <color name="teal_700">#FF3D6B54</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="grey">#FFCCCCCC</color>
-    <color name="amber_400">#FFFFC107</color>
-    <color name="deep_orange_400">#FFFF7043</color>
+    <color name="grey">#FF8A8380</color>
+    <color name="amber_400">#FFC4955A</color>
+    <color name="deep_orange_400">#FFA67635</color>
 </resources>
